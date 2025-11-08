@@ -210,6 +210,97 @@ if st.button("Get Personalized Recommendations", type="primary", use_container_w
         if rec_count > 1:
             st.info(f"**Alternative Solutions:** System generated {rec_count} ranked recommendations based on your situation.")
         
+        # Analyze information completeness
+        info_analysis = {
+            'provided': [],
+            'assumed': []
+        }
+    
+        # Core information (always provided)
+        info_analysis['provided'].extend([
+            f"Sleep hours: {sleep_hours}h",
+            f"Energy level: {energy_level}",
+            f"Stress level: {stress_level}",
+            f"Study hours today: {study_hours_today}h",
+            f"Deadline urgency: {deadline_urgency}",
+            f"Break taken: {'Yes' if break_taken else 'No'}"
+        ])
+    
+        # Check optional fields
+        if passive_learning_hours != 1.0:
+            info_analysis['provided'].append(f"Passive learning: {passive_learning_hours}h")
+        else:
+            info_analysis['assumed'].append("Passive learning: 1h (default - moderate amount)")
+    
+        if task_complexity != "Medium":
+            info_analysis['provided'].append(f"Task complexity: {task_complexity}")
+        else:
+            info_analysis['assumed'].append("Task complexity: Medium (default)")
+    
+        if sedentary_hours != 4.0:
+            info_analysis['provided'].append(f"Sedentary hours: {sedentary_hours}h")
+        else:
+            info_analysis['assumed'].append("Sedentary hours: 4h (default - typical)")
+    
+        if social_isolation_days != 1:
+            info_analysis['provided'].append(f"Social isolation: {social_isolation_days} days")
+        else:
+            info_analysis['assumed'].append("Social isolation: 1 day (default - recent contact)")
+    
+        if cramming:
+            info_analysis['provided'].append("Cramming: Yes")
+        else:
+            info_analysis['assumed'].append("Cramming: No (default - normal pace)")
+    
+        # Display information completeness - COLLAPSED BY DEFAULT
+        assumptions_count = len(info_analysis['assumed'])
+    
+        if assumptions_count > 0:
+            # Show expander with count - user can click to expand
+            with st.expander(f"View Information Completeness Analysis ({assumptions_count} assumptions made)", expanded=False):
+            
+                col1, col2 = st.columns(2)
+            
+                with col1:
+                    st.markdown("### Information Provided")
+                    for item in info_analysis['provided']:
+                        st.markdown(f"- {item}")
+            
+                with col2:
+                    st.markdown("### Assumptions Made")
+                    for item in info_analysis['assumed']:
+                        st.markdown(f"- {item}")
+            
+                st.markdown("---")
+            
+                # Calculate completeness percentage
+                total_fields = len(info_analysis['provided']) + len(info_analysis['assumed'])
+                completeness = (len(info_analysis['provided']) / total_fields) * 100
+            
+                st.metric("Information Completeness", f"{completeness:.0f}%")
+            
+                st.markdown(f"""
+                **ES Feature: Incomplete Information Handling**
+            
+                The expert system successfully processed your request with **{assumptions_count} missing optional fields** by:
+            
+                1. ✅ **Making conservative assumptions** based on typical student patterns
+                2. ✅ **Reducing confidence levels** by ~10-15% for rules using assumed data
+                3. ✅ **Providing useful recommendations** despite incomplete information
+                """)
+        else:
+            # If all fields provided, show a small success badge
+            with st.expander("✅ View Information Completeness Analysis (100% complete)", expanded=False):
+                st.success("""
+                **100% Information Completeness!**
+            
+                All optional fields were provided. The expert system has maximum confidence in its recommendations.
+            
+                **Information Provided:**
+                """)
+                for item in info_analysis['provided']:
+                    st.markdown(f"- {item}")
+
         # ES Features in action - metrics
         metric_cols = st.columns(3)
         with metric_cols[0]:

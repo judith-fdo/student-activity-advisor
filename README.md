@@ -1,17 +1,30 @@
 # Daily Activity Recommendation System for Students
 
-An intelligent expert system that helps students make better daily decisions about study timing, rest, exercise, and social activities using rule-based reasoning.
+An intelligent expert system that helps students make better daily decisions about study timing, rest, exercise, and social activities using **hybrid AI architecture** combining rule-based reasoning with natural language understanding.
 
 ## Overview
 
-This expert system was developed as part of the **CM3610 - Expert Systems** course at the University of Moratuwa. It demonstrates all 8 key characteristics of expert systems while addressing the real-world problem of student time management and wellness.
+This expert system demonstrates all 8 key characteristics of expert systems while addressing the real-world problem of student time management and wellness.
+
+### Key Innovation: Hybrid AI Architecture
+The system uniquely combines:
+- **Expert System (Experta)** - Rule-based reasoning for transparent, explainable decisions
+- **LLM (Llama 3.3 via Groq)** - Natural language understanding for intuitive interaction
+- **100% Free** - No API costs using Groq's free tier
+
+Users can choose between **two interaction modes**:
+
+1. **Structured Input** - Traditional widget-based interface (sliders, dropdowns)
+2. **Natural Language** - Conversational AI interface (describe situation in your own words)
+
+Both modes use the **same expert system engine** for reasoning, ensuring full explainability regardless of input method!
 
 ## Features
 
 The system demonstrates **all 8 expert system characteristics**:
 
 1. **Narrow Domain** - Focuses exclusively on student daily activity decisions
-2. **Question-Driven** - Asks 6-12 structured questions to assess student state
+2. **Question-Driven** - Asks 6-12 structured questions OR accepts natural language descriptions
 3. **Handles Incomplete Information** - Works even with missing data using conservative assumptions
 4. **Provides Alternative Solutions** - Offers multiple ranked recommendations
 5. **Confidence Levels** - Each recommendation includes 70-90% evidence-based confidence
@@ -23,8 +36,35 @@ The system demonstrates **all 8 expert system characteristics**:
 
 - **Expert System Engine**: Experta (Python rule-based reasoning library)
 - **User Interface**: Streamlit (Interactive web application)
+- **Natural Language Processing**: Groq API with Llama 3.3 70B 
 - **Knowledge Base**: 25 research-backed rules from cognitive psychology and student wellness studies
 - **Python Version**: 3.10+
+
+### Hybrid Architecture
+```
+┌─────────────────────────────────────────────────────────┐
+│                    User Input                           │
+│  ┌──────────────────┐      ┌──────────────────┐        │
+│  │  Structured      │  OR  │  Natural         │        │
+│  │  (Widgets)       │      │  Language        │        │
+│  └────────┬─────────┘      └────────┬─────────┘        │
+│           │                         │                   │
+│           │                    ┌────▼────┐              │
+│           │                    │  Groq   │              │
+│           │                    │  LLM    │              │
+│           │                    └────┬────┘              │
+│           │                         │                   │
+│           └─────────┬───────────────┘                   │
+│                     ▼                                   │
+│           ┌─────────────────┐                          │
+│           │ Expert System   │                          │
+│           │ (Experta)       │                          │
+│           │ 25 Rules        │                          │
+│           └────────┬────────┘                          │
+│                    ▼                                   │
+│           Explainable Recommendations                  │
+└─────────────────────────────────────────────────────────┘
+```
 
 ## Knowledge Base
 
@@ -65,18 +105,27 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-4. **Run the application**
+4. **Set up Groq API key (Optional - for Natural Language interface)**
+   - Get a free API key from https://console.groq.com
+   - Create a `.env` file in the project folder:
+```
+   GROQ_API_KEY=your_groq_api_key_here
+```
+   - **Note**: Structured Input works without API key!
+
+5. **Run the application**
 ```bash
 streamlit run app.py
 ```
 
-5. **Open in browser**
+6. **Open in browser**
 The app will automatically open at `http://localhost:8501`
 
-## 📁 Project Structure
+## Project Structure
 ```
 student-activity-advisor/
 │
+├── .env                    # API keys (create this, not in repo)
 ├── .gitignore              # Git ignore rules
 ├── README.md               # Project documentation
 ├── REFERENCES.md           # Complete academic citations (33 sources)
@@ -84,16 +133,30 @@ student-activity-advisor/
 │
 ├── fix_experta.py          # Python 3.10+ compatibility patch
 ├── expert_system.py        # Core expert system logic (25 rules)
-└── app.py                  # Streamlit user interface
+├── llm_parser.py           # Natural language parser (Groq LLM)
+└── app.py                  # Streamlit user interface (with tabs)
 ```
 
 ## System Architecture
+
+**Two Input Modes:**
 ```
-User Input → Streamlit UI → Expert System (Experta) → Rule Matching → Recommendations
-                                      ↓
-                              Knowledge Base (25 Rules)
-                                      ↓
-                              Evidence Sources (Research)
+Mode 1: Structured Input (Widgets)
+User → Sliders/Dropdowns → Expert System → Recommendations
+
+Mode 2: Natural Language (AI Chat)
+User → Natural Text → Groq LLM → Structured Data → Expert System → Recommendations
+```
+
+**Core Processing:**
+```
+Expert System (Experta)
+         ↓
+Knowledge Base (25 Rules)
+         ↓
+Evidence Sources (Research)
+         ↓
+Explainable Recommendations
 ```
 
 ## Use Cases
@@ -108,6 +171,18 @@ The system helps students with:
 
 
 ## Example Scenarios
+
+### Natural Language Input Example
+**User types:** *"I slept only 4 hours, feeling exhausted, have exam tomorrow morning"*
+
+**AI Extracts:**
+- Sleep: 4 hours
+- Energy: Very Low  
+- Deadline: Urgent (within 24h)
+
+**Expert System Output:**
+- Top Recommendation: 30-minute power nap (90% confidence)
+- Rules Fired: R1_CRITICAL_SLEEP_DEFICIT, R3_POWER_NAP
 
 ### Scenario 1: Sleep-Deprived with Urgent Deadline
 **Input:**

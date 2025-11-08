@@ -24,3 +24,6 @@ Thumbs.db
 # Project specific
 *.log
 .cache/
+
+# env file
+.env
